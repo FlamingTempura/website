@@ -1,0 +1,14 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node ./src/build.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bibtex-parse": "^0.2.7"
+  }
+}
