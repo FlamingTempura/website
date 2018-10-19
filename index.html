@@ -6,129 +6,10 @@
 	<meta name="viewport" content="width=900, initial-scale=1">
 	<meta name="description" content="I am a web developer and Web Science PhD student at the University of Southampton with interests in data visualisation, user interface design and healthcare informatics.">
 	<link rel="shortcut icon" type="image/x-icon" href="/media/favicon.ico">
-	<style>
-	@font-face {
-		font-family: 'Roboto';
-		font-style: normal;
-		font-weight: 300;
-		src: local('Roboto Light'), local('Roboto-Light'), url('/media/fonts/Roboto-Light.woff') format('woff');
-	}
-	* {
-		box-sizing: border-box;
-	}
-	body {
-		font-family: 'Roboto', sans-serif;
-		font-size: 15px;
-		line-height: 1.4em;
-		color: #333;
-		margin: 0;
-	}
-	a {
-		color: #234C99;
-		text-decoration: none;
-	}
-	a:hover {
-		text-decoration: underline;
-	}
-	img {
-		border: 0;
-		max-width: 100%;
-	}
-	h1, h2, h3, h4 {
-		font-weight: 300;
-		line-height: 1em
-	}
-	h1 a, h2 a, h3 a, h4 a {
-		color: inherit;
-	}
-	h1 {
-		font-size: 2em;
-		color: #222;
-		margin: 0 0 0.5em 0;
-	}
-	h2 {
-		font-size: inherit;
-		margin: 0 0 0.5em 0;
-		padding: 0;
-	}
-	h3 {
-		font-size: 1.6em;
-		border-top: 3px dashed #f0f0f0;
-		padding-top: 24px;
-		margin: 16px 0 20px 0;
-	}
-	h4 {
-		font-size: 1.1em;
-		margin: 1em 0 0.5em 0;
-	}
-	p {
-		margin: 0.2em 0 1em 0;
-	}
-	[hidden] {
-		display: none;
-	}
-	.page {
-		margin: 40px auto;
-		padding: 20px;
-		max-width: 900px;
-		border-bottom: 1px solid #f0f0f0;
-	}
-	header {
-		display: flex;
-	}
-	header img {
-		width: 160px;
-		height: 160px;
-		flex: 0 0 auto;
-	}
-	header .bio {
-		flex: 1 1 auto;
-		margin-right: 28px;
-	}
-	header .links a {
-		padding: 0 10px 0 0;
-	}
-	header .links a::before {
-		content: '[ ';
-		font-weight: bold;
-		font-size: 0.8em;
-	}
-	header .links a::after {
-		content: ' ]';
-		font-weight: bold;
-		font-size: 0.8em;
-	}
-
-	section {
-		display: flex;
-	}
-	section .media {
-		width: 400px;
-		flex: 0 0 auto;
-	}
-	section .content {
-		flex: 1 1 auto;
-		min-width: 400px;
-		margin-right: 28px !important;
-	}
-
-	ul.list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		font-size: 0.9em;
-	}
-	ul.list li {
-		margin: 0 0 12px 0;
-	}
-	.caption {
-		font-size: 0.85em;
-		padding: 0 3px 20px;
-	}
-	</style>
+	<link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 
-<body vocab="http://schema.org/" typeof="WebPage" class="index">
+<body vocab="http://schema.org/" typeof="WebPage" class="home">
 	<div class="page">
 		<header typeof="Person">
 
@@ -199,26 +80,50 @@
 			</ul>
 
 			<div class="media">
-				<iframe width="400" height="200" src="https://www.youtube.com/embed/fB2r7V105r8" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-				<div class="caption">West et al (2016) research summary</div>
-
-				<iframe width="400" height="200" src="https://www.youtube.com/embed/SO321qcjmxs" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-				<div class="caption">West et al (2018) talk at CHI'18, Montreal</div>
+				<figure>
+					<a class="video" href="https://www.youtube.com/watch/fB2r7V105r8"><img src="/media/vid-chi16.png"></a>
+					<figcaption>West et al (2016) research summary</figcaption>
+				</figure>
+				<figure>
+					<a class="video" href="https://www.youtube.com/watch/SO321qcjmxs"><img src="/media/vid-chi18.png"></a>
+					<figcaption>West et al (2018) talk at CHI'18, Montreal</figcaption>
+				</figure>
 			</div>
 
 		</section>
 
-		<h3>Other writing</h3>
+		<h3>Blog</h3>
 
 		<section>
 			<ul class="list content">
-				<li><a href="https://openinnovation.blog.gov.uk/2018/04/13/where-could-distributed-ledger-technology-be-a-good-fit-for-government-2/">Where could distributed ledger technology be a good fit for government?</a> (2018). <em>Open Innovation Team Blog, UK Cabinet Office</em>.</li>
-				<li><a href="https://openinnovation.blog.gov.uk/2018/04/11/consumer-health-tech-and-the-more-informed-patient/">Consumer Health Tech and The More Informed Patient</a> (2018). <em>Open Innovation Team Blog, UK Cabinet Office</em>.</li>
-				<li><a href="https://openinnovation.blog.gov.uk/2018/02/19/is-distributed-ledger-technology-the-answer/">Is distributed ledger technology the answer?</a> (2018). <em>Open Innovation Team Blog, UK Cabinet Office</em>.</li>
-				<li><a href="http://blog.soton.ac.uk/wsi/cdt-students-visit-nus-tshinghau-university-china/">China research trip</a> (2017). <em>Web Science Blog, University of Southampton</em>.</li>
-				<li>Web Doomsday (2014).</li>
-				<li><a href="media/virtual-personal-assistants.html">Soon, everyone will have a virtual personal assistant</a> (2014).</li>
-				<!--OTHER WRITING-->
+				<li>13 Apr 2018 - <a href="https://openinnovation.blog.gov.uk/2018/04/13/where-could-distributed-ledger-technology-be-a-good-fit-for-government-2/">Where could distributed ledger technology be a good fit for government?</a> <em>Posted to Open Innovation Team Blog, UK Cabinet Office</em>.</li>
+				<li>11 Apr 2018 - <a href="https://openinnovation.blog.gov.uk/2018/04/11/consumer-health-tech-and-the-more-informed-patient/">Consumer Health Tech and The More Informed Patient</a> <em>Posted to Open Innovation Team Blog, UK Cabinet Office</em>.</li>
+				<li>19 Feb 2018 - <a href="https://openinnovation.blog.gov.uk/2018/02/19/is-distributed-ledger-technology-the-answer/">Is distributed ledger technology the answer?</a> <em>Posted to Open Innovation Team Blog, UK Cabinet Office</em>.</li>
+				<li>3 Nov 2017 - <a href="http://blog.soton.ac.uk/wsi/cdt-students-visit-nus-tshinghau-university-china/">China research trip</a> <em>Posted to Web Science Blog, University of Southampton</em>.</li>
+				<li>29 Apr 2014 - <a href="/blog/2014/leapinit-testing-and-code-quality.html">Testing and code quality</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>28 Apr 2014 - <a href="/blog/2014/leapinit-design-patterns,-libraries-and-apis.html">Design Patterns, Libraries and APIs</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>22 Apr 2014 - <a href="/blog/2014/leapinit-prototype-2_-barcode-scanning.html">Prototype 2: Barcode scanning</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>11 Apr 2014 - <a href="/blog/2014/leapinit-revised-mockups-and-the-honeycomb.html">Revised mockups and the Honeycomb</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>10 Apr 2014 - <a href="/blog/2014/leapinit-prototype-1_-mobile-interface.html">Prototype 1: Mobile interface</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>7 Apr 2014 - <a href="/blog/2014/leapinit-development-environment.html">Development environment</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>7 Apr 2014 - <a href="/blog/2014/leapinit-linking-similar-rooms-and-room-clustering.html">Linking similar rooms and room clustering</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>4 Apr 2014 - <a href="/blog/2014/leapinit-architecture-overview.html">Architecture overview</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>4 Apr 2014 - <a href="/blog/2014/leapinit-class-and-eer-diagram.html">Class and EER Diagram</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>3 Apr 2014 - <a href="/blog/2014/leapinit-homophily-heterophily.html">Social Networks: Homophily and Heterophily</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>3 Apr 2014 - <a href="/blog/2014/leapinit-branding.html">Branding</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>28 Mar 2014 - <a href="/blog/2014/leapinit-mockups.html">Mockups</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>22 Mar 2014 - <a href="/blog/2014/leapinit-mobile-devices.html">Mobile devices</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>13 Mar 2014 - <a href="/blog/2014/leapinit-a-virtual-world-social-network_-a-user-perspective.html">A virtual world social network? A user perspective</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>10 Mar 2014 - <a href="/blog/2014/leapinit-a-virtual-world-social-network_.html">A virtual world social network?</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>9 Mar 2014 - <a href="/blog/2014/leapinit-existing-systems_-gaming-social-networks.html">Existing systems: gaming social networks</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>7 Mar 2014 - <a href="/blog/2014/leapinit-a-gaming-experience-social-network_-a-user-perspective.html">A gaming experience social network? A user perspective</a> <em>Posted to Web Science COMP6051 module, University of Southampton</em>.</li>
+				<li>9 Jan 2014 - <a href="/blog/2014/virtual-personal-assistants.html">Soon, everyone will have a virtual personal assistant</a>.</li>
+				<li>1 Jan 2014 - <a href="/blog/2014/web-doomsday-the-fall-of-great-power.html">Web Doomsday: The Fall Of Great Power</a></a> <em>Posted to Web Science COMP6044 module, University of Southampton</em>.</li>
+				<li>31 Dec 2013 - <a href="/blog/2013/web-doomsday-the-loss-of-a-luxury,-convenience-and-basic-need.html">Web Doomsday: The Loss Of A Luxury, Convenience And Basic Need</a> <em>Posted to Web Science COMP6044 module, University of Southampton</em>.</li>
+				<li>18 Nov 2013 - <a href="/blog/2013/web-doomsday-northeast-blackout-case-study.html">Web Doomsday: Northeast Blackout Case Study</a> <em>Posted to Web Science COMP6044 module, University of Southampton</em>.</li>
+				<li>13 Nov 2013 - <a href="/blog/2013/web-doomsday-how-realistic-is-it.html">Web Doomsday: How Realistic Is It?</a> <em>Posted to Web Science COMP6044 module, University of Southampton</em>.</li>
+				<li>14 Oct 2013 - <a href="/blog/2013/web-doomsday-what-will-happen-if-the-web-just-disappeared.html">Web Doomsday: What Will Happen if The Web Just Disappeared?</a> <em>Posted to Web Science COMP6044 module, University of Southampton</em>.</li>
+				<!--BLOG-->
 			</ul>
 		</section>
 
@@ -240,13 +145,14 @@
 			</div>
 
 			<div class="media">
-
-				<img src="/media/companion.png">
-				<div class="caption">Screenshot of LifeCourse Companion, our flagship product at PInCH Medical Systems Ltd.</div>
-
-				<iframe width="400" height="200" src="https://www.youtube.com/embed/Rq09i_06i_Y" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-				<div class="caption">LeapIn.it demonstration</div>
-
+				<figure>
+					<img src="/media/companion.png">
+					<figcaption>Screenshot of LifeCourse Companion, our flagship product at PInCH Medical Systems Ltd.</figcaption>
+				</figure>
+				<figure>
+					<a class="video" href="https://www.youtube.com/watch/Rq09i_06i_Y"><img src="/media/vid-leapinit.png"></a>
+					<figcaption>LeapIn.it demonstration</figcaption>
+				</figure>
 			</div>
 		</section>
 	</div>

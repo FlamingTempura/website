@@ -3,14 +3,15 @@
 const fs = require('fs');
 const path = require('path');
 const bibtex = require('bibtex-parse');
+const moment = require('moment');
 
 let bibs = {};
-['publications', 'other-writing', 'programming'].forEach(file => {
-	const bib = fs.readFileSync(path.join(__dirname, `${file}.bib`), 'utf8');
+['publications', 'blog', 'programming'].forEach(file => {
+	const bib = fs.readFileSync(path.resolve(__dirname, `${file}.bib`), 'utf8');
 	bibs[file] = bibtex.parse(bib).entries;
 });
 
-let html = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
+let html = fs.readFileSync(path.resolve(__dirname, 'template.html'), 'utf8');
 
 const prop = (item, key) => {
 	let val = (item.properties[key] || {}).value || '';
@@ -62,25 +63,53 @@ bibs.publications.forEach(item => {
 	html = html.replace(/(<!--PUBLICATIONS-->)/, `<li>${str}.</li>\n${indent}$1`);
 });
 
-bibs['other-writing'].forEach(item => {
-	let url = getUrl(item);
+let months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
+              'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
+
+bibs.blog.forEach(item => {
+	item.date = new Date(prop(item, 'year'), months.indexOf(prop(item, 'month')), prop(item, 'day'));
+});
+
+// automatically generate bib entries for blogs
+fs.readdirSync(path.resolve(__dirname, '../blog')).map(year => {
+	fs.readdirSync(path.resolve(__dirname, `../blog/${year}`)).map(filename => {
+		let post = fs.readFileSync(path.resolve(__dirname, `../blog/${year}/${filename}`), 'utf8');
+		let date = new Date();
+		let datematch = post.match(/\d+(st|nd|rd|th) \w+ \d\d\d\d \d\d:\d\d/);
+		if (datematch) {
+			date = moment(datematch[0], 'Do MMMM YYYY HH:mm').toDate();
+		}
+		let titlematch = post.match(/<h1>(.*)<\/h1>/);
+		let publisherMatch = post.match(/<div class="publisher">(.*)<\/div>/);
+
+		bibs.blog.push({
+			date,
+			properties: {
+				url: { value: `/blog/${year}/${filename}` },
+				title: { value: titlematch[1] },
+				publisher: publisherMatch ? { value: publisherMatch[1] } : null
+			}
+		});
+	});
+});
+
+bibs.blog.sort((a, b) => b.date - a.date).forEach(post => {
 	let citation = [];
 
-	if (url) {
-		citation.push(`<a href="${url}">`);
-	}
-	citation.push(prop(item, 'title'));
-	if (url) {
-		citation.push(`</a>`);
-	}
-	citation.push(` (${prop(item, 'year')})`);
+
+	citation.push(`${moment(post.date).format('D MMM YYYY')} - `);
+
+	citation.push(`<a href="${prop(post, 'url')}">`);
+	citation.push(prop(post, 'title'));
+	citation.push(`</a>`);
 	
-	if (prop(item, 'publisher')) {
-		citation.push(`. <em>${prop(item, 'publisher')}</em>`);
+	if (prop(post, 'publisher')) {
+		citation.push(` <em>Posted to ${prop(post, 'publisher')}</em>`);
 	}
 	
 	let str = citation.join('');
-	html = html.replace(/(<!--OTHER WRITING-->)/, `<li>${str}.</li>\n${indent}$1`);
+	html = html.replace(/(<!--BLOG-->)/, `<li>${str}.</li>\n${indent}$1`);
 });
 
 

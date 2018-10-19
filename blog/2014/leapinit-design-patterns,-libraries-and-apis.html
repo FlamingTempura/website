@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Design Patterns, Libraries and APIs</title>
+	<link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body class="article">
+
+	<header>
+		<h2>Blog post</h2>
+		<h1>Design Patterns, Libraries and APIs</h1>
+		<h4>By Peter West &bullet; 28th April 2014 22:28</h4>
+		<small><a href="http://blog.soton.ac.uk/orion/implementation/libraries/">Originally posted</a> for the <div class="publisher">Web Science COMP6051 module, University of Southampton</div></small>
+	</header>
+		
+					<p>During our development of the <a href="http://blog.soton.ac.uk/orion/implementation/screenshots-from-the-implemented-application/">LeapIn.it prototype</a>, we have used a number of design patterns, libraries and API’s. This post will give an overview of the most crucial of these.</p>
+<figure id="attachment_718" class="wp-caption aligncenter" style="width: 1019px"><a href="./Design Patterns, Libraries and APIs_files/Libraries-2.png"><img class="size-full wp-image-718" alt="Libraries (blue), APIs (red) and design patterns (green) used within the LeapIn.it prototype, and where they are used." src="./Design Patterns, Libraries and APIs_files/Libraries-2.png" width="1019" height="286" srcset="http://blog.soton.ac.uk/orion/files/2014/04/Libraries-2.png 1019w, http://blog.soton.ac.uk/orion/files/2014/04/Libraries-2-300x84.png 300w" sizes="(max-width: 1019px) 100vw, 1019px"></a><figcaption class="wp-caption-text">Libraries (blue), APIs (red) and design patterns (green) used within the LeapIn.it prototype, and where they are used.</figcaption></figure>
+<h3>Server</h3>
+<p>The server is responsible for creating a REST interface for database access. As mentioned in our <a href="http://blog.soton.ac.uk/orion/design/architecture-overview/">post on architecture</a>, we have chosen to use RedBeanPHP to communicate with the database, and Slim.php as a REST endpoint. We have also used tokens for security, PHPImageWorkshop for thumbnail generation and AlchemyAPI for sentiment analysis.</p>
+<p><b>Database access through RedBean</b></p>
+<p><a href="http://redbeanphp.com/">RedBean</a> is an Object-Relational Mapping (ORM), meaning that records in the database are available as objects. For example, the following PHP code may be used to change a person that exists in the database:</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tbody><tr><td class="code"><pre class="php" style="font-family:monospace;"><span style="color: #666666; font-style: italic;">// Load the person with ID 209 from the database</span>
+<span style="color: #000088;">$person</span> <span style="color: #339933;">=</span> R<span style="color: #339933;">::</span><span style="color: #004000;">load</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'person'</span><span style="color: #339933;">,</span> <span style="color: #cc66cc;">209</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #666666; font-style: italic;">// Get their name</span>
+<span style="color: #000088;">$name</span> <span style="color: #339933;">=</span> <span style="color: #000088;">$person</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">name</span><span style="color: #339933;">;</span>
+<span style="color: #666666; font-style: italic;">// Change their name</span>
+<span style="color: #000088;">$person</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">name</span> <span style="color: #339933;">=</span> <span style="color: #0000ff;">'Joel'</span><span style="color: #339933;">;</span>
+<span style="color: #666666; font-style: italic;">// Update the database</span>
+R<span style="color: #339933;">::</span><span style="color: #004000;">store</span><span style="color: #009900;">(</span><span style="color: #000088;">$person</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre></td></tr></tbody></table><p class="theCode" style="display:none;">// Load the person with ID 209 from the database
+$person = R::load('person', 209);
+// Get their name
+$name = $person-&gt;name;
+// Change their name
+$person-&gt;name = 'Joel';
+// Update the database
+R::store($person);</p></div>
+
+<p>Using RedBean results in simple and more maintainable code when accessing the database. It also provides security over direct SQL queries, as it prevents SQL injection.</p>
+<p><b>REST interface through Slim.php</b></p>
+<p><a href="http://www.slimframework.com/">Slim</a> provides a simple way to create a REST endpoint on the server, which we use to allow clients to interact with the database.</p>
+<p>As an example, the following code allows a user to create a user. First, the client will sent a POST request to ‘/api/person’ with&nbsp;the username and password in the request body. All interactions with the database are done through RedBean (denoted by R). Using Slim.php, we listen for that response. In addition, we use middleware to ensure that all interactions are in JavaScript Object Notation (JSON) – this is done by adding the variable $requestJSON in the first line. The body of the function first checks if the username is already in use, and if not, creates a “person” with a username and a password (which is stored as a SHA1 hash for security). An avatar is then created by copying a random template (there are about 50 avatar templates in the database by default). The person is then stored in the database and exported as REST to the HTTP response.</p>
+
+<div class="wp_syntax" style="position:relative;"><table><caption><a href="https://github.com/FlamingTempura/leapinit/blob/master/server/index.php">/leapinit/blob/master/server/index.php</a></caption><tbody><tr><td class="line_numbers"><pre>287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+</pre></td><td class="code"><pre class="php" style="font-family:monospace;"><span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">post</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'/person/'</span><span style="color: #339933;">,</span> <span style="color: #000088;">$requestJSON</span><span style="color: #339933;">,</span> <span style="color: #000000; font-weight: bold;">function</span> <span style="color: #009900;">(</span><span style="color: #009900;">)</span> <span style="color: #000000; font-weight: bold;">use</span> <span style="color: #009900;">(</span><span style="color: #339933;">&amp;</span><span style="color: #000088;">$app</span><span style="color: #339933;">,</span> <span style="color: #339933;">&amp;</span><span style="color: #000088;">$params</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+	<span style="color: #b1b100;">if</span> <span style="color: #009900;">(</span>R<span style="color: #339933;">::</span><span style="color: #004000;">findOne</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'person'</span><span style="color: #339933;">,</span> <span style="color: #0000ff;">' username = ? '</span><span style="color: #339933;">,</span> <span style="color: #990000;">array</span><span style="color: #009900;">(</span><span style="color: #000088;">$params</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">username</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+		<span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">render</span><span style="color: #009900;">(</span><span style="color: #cc66cc;">401</span><span style="color: #339933;">,</span> <span style="color: #009900;">[</span>
+			<span style="color: #0000ff;">'msg'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #0000ff;">'Username already in use.'</span>
+		<span style="color: #009900;">]</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #009900;">}</span> <span style="color: #b1b100;">else</span> <span style="color: #009900;">{</span>
+		<span style="color: #000088;">$person</span> <span style="color: #339933;">=</span> R<span style="color: #339933;">::</span><span style="color: #004000;">dispense</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'person'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		<span style="color: #000088;">$person</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">username</span> <span style="color: #339933;">=</span> <span style="color: #000088;">$params</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">username</span><span style="color: #339933;">;</span>
+		<span style="color: #000088;">$person</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">password</span> <span style="color: #339933;">=</span> <span style="color: #990000;">sha1</span><span style="color: #009900;">(</span><span style="color: #000088;">$params</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">password</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+		<span style="color: #000088;">$avatar</span> <span style="color: #339933;">=</span> R<span style="color: #339933;">::</span><span style="color: #004000;">dup</span><span style="color: #009900;">(</span>R<span style="color: #339933;">::</span><span style="color: #004000;">findOne</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'avatar'</span><span style="color: #339933;">,</span> <span style="color: #0000ff;">' ORDER BY RAND() LIMIT 1 '</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		<span style="color: #000088;">$avatar</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">bgcolor</span> <span style="color: #339933;">=</span> randomColor<span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		<span style="color: #000088;">$person</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">avatar</span> <span style="color: #339933;">=</span> <span style="color: #000088;">$avatar</span><span style="color: #339933;">;</span>
+		<span style="color: #000088;">$person</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">joined</span> <span style="color: #339933;">=</span> <span style="color: #990000;">time</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+		R<span style="color: #339933;">::</span><span style="color: #004000;">store</span><span style="color: #009900;">(</span><span style="color: #000088;">$person</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+		<span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">render</span><span style="color: #009900;">(</span><span style="color: #cc66cc;">201</span><span style="color: #339933;">,</span> <span style="color: #009900;">[</span>
+			<span style="color: #0000ff;">'response'</span> <span style="color: #339933;">=&gt;</span> exportPerson<span style="color: #009900;">(</span><span style="color: #000088;">$person</span><span style="color: #009900;">)</span>
+		<span style="color: #009900;">]</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #009900;">}</span>
+<span style="color: #009900;">}</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre></td></tr></tbody></table><p class="theCode" style="display:none;">$app-&gt;post('/person/', $requestJSON, function () use (&amp;$app, &amp;$params) {
+	if (R::findOne('person', ' username = ? ', array($params-&gt;username))) {
+		$app-&gt;render(401, [
+			'msg' =&gt; 'Username already in use.'
+		]);
+	} else {
+		$person = R::dispense('person');
+		$person-&gt;username = $params-&gt;username;
+		$person-&gt;password = sha1($params-&gt;password);
+
+		$avatar = R::dup(R::findOne('avatar', ' ORDER BY RAND() LIMIT 1 '));
+		$avatar-&gt;bgcolor = randomColor();
+		$person-&gt;avatar = $avatar;
+		$person-&gt;joined = time();
+
+		R::store($person);
+
+		$app-&gt;render(201, [
+			'response' =&gt; exportPerson($person)
+		]);
+	}
+});</p></div>
+
+<p><b>Security through tokens</b></p>
+<p>Because the server and client will reside in different domains, it is not possible to use cookies for authentication. Instead, we have used tokens, which are unique random strings assigned to authenticated users, which they must provide whenever they make a request to the server. This is based on a model provided in <a href="http://security.stackexchange.com/questions/19676/token-based-authentication-securing-the-token">this Stack Exchange discussion</a>.</p>
+<p>The token is sent as part of the URL. For example, to request a room, the token would be placed on then end: <code>http://leapin.it/api/room/4?token=[user's token]</code></p>
+<p>This is not actually safe over HTTP, as the token may be observed by third parties who see the URL. If a person were to steal a token, they would be able to authenticate themselves as the user by appending the token to the end of URL’s. This is known as <a href="http://en.wikipedia.org/wiki/Session_hijacking">session hijacking</a>. To prevent this, encryption will need to be used, ideally through SSL.</p>
+<p>Checking for tokens is done as middleware within Slim.php. The middleware is a function which validates that a token exists and identifies the user it belongs to:</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tbody><tr><td class="code"><pre class="php" style="font-family:monospace;"><span style="color: #000088;">$validateToken</span> <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">function</span> <span style="color: #009900;">(</span><span style="color: #009900;">)</span> <span style="color: #000000; font-weight: bold;">use</span> <span style="color: #009900;">(</span><span style="color: #000088;">$app</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+	<span style="color: #000088;">$tokenKey</span> <span style="color: #339933;">=</span> <span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">request</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">params</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'token'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #990000;">error_log</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'checking token '</span> <span style="color: #339933;">.</span> <span style="color: #000088;">$tokenKey</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #000088;">$token</span> <span style="color: #339933;">=</span> R<span style="color: #339933;">::</span><span style="color: #004000;">findOne</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'token'</span><span style="color: #339933;">,</span> <span style="color: #0000ff;">' `key` = ? '</span><span style="color: #339933;">,</span> <span style="color: #990000;">array</span><span style="color: #009900;">(</span><span style="color: #000088;">$tokenKey</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #990000;">error_log</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'ok'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #b1b100;">if</span> <span style="color: #009900;">(</span><span style="color: #000088;">$token</span> <span style="color: #339933;">!==</span> <span style="color: #009900; font-weight: bold;">null</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+		<span style="color: #990000;">error_log</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'found token with user'</span><span style="color: #339933;">,</span> <span style="color: #000088;">$token</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">person_id</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		<span style="color: #000088;">$user</span> <span style="color: #339933;">=</span> R<span style="color: #339933;">::</span><span style="color: #004000;">load</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'person'</span><span style="color: #339933;">,</span> <span style="color: #000088;">$token</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">person_id</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #009900;">}</span>
+	<span style="color: #b1b100;">if</span> <span style="color: #009900;">(</span><span style="color: #990000;">isset</span><span style="color: #009900;">(</span><span style="color: #000088;">$user</span><span style="color: #009900;">)</span> <span style="color: #339933;">&amp;&amp;</span> <span style="color: #000088;">$user</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">id</span> <span style="color: #339933;">!==</span> <span style="color: #cc66cc;">0</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+		<span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">user</span> <span style="color: #339933;">=</span> <span style="color: #000088;">$user</span><span style="color: #339933;">;</span>
+	<span style="color: #009900;">}</span> <span style="color: #b1b100;">else</span> <span style="color: #009900;">{</span>
+		<span style="color: #990000;">error_log</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'no user'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		<span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">render</span><span style="color: #009900;">(</span><span style="color: #cc66cc;">401</span><span style="color: #339933;">,</span> <span style="color: #009900;">[</span>
+			<span style="color: #0000ff;">'msg'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #0000ff;">'Unauthorized.'</span>
+		<span style="color: #009900;">]</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #009900;">}</span>
+<span style="color: #009900;">}</span><span style="color: #339933;">;</span></pre></td></tr></tbody></table><p class="theCode" style="display:none;">$validateToken = function () use ($app) {
+	$tokenKey = $app-&gt;request()-&gt;params('token');
+	error_log('checking token ' . $tokenKey);
+	$token = R::findOne('token', ' `key` = ? ', array($tokenKey));
+	error_log('ok');
+	if ($token !== null) {
+		error_log('found token with user', $token-&gt;person_id);
+		$user = R::load('person', $token-&gt;person_id);
+	}
+	if (isset($user) &amp;&amp; $user-&gt;id !== 0) {
+		$app-&gt;user = $user;
+	} else {
+		error_log('no user');
+		$app-&gt;render(401, [
+			'msg' =&gt; 'Unauthorized.'
+		]);
+	}
+};</p></div>
+
+<p>This can then be used when defining a request response, as shown below when fetching a user:</p>
+
+<div class="wp_syntax" style="position:relative;"><table><caption><a href="https://github.com/FlamingTempura/leapinit/blob/master/server/index.php">/leapinit/blob/master/server/index.php</a></caption><tbody><tr><td class="line_numbers"><pre>248
+249
+250
+251
+</pre></td><td class="code"><pre class="php" style="font-family:monospace;"><span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">get</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'/person/:id/'</span><span style="color: #339933;">,</span> <span style="color: #000088;">$requestJSON</span><span style="color: #339933;">,</span> <span style="color: #000088;">$validateToken</span><span style="color: #339933;">,</span> <span style="color: #000000; font-weight: bold;">function</span> <span style="color: #009900;">(</span><span style="color: #000088;">$id</span><span style="color: #009900;">)</span> <span style="color: #000000; font-weight: bold;">use</span> <span style="color: #009900;">(</span><span style="color: #339933;">&amp;</span><span style="color: #000088;">$app</span><span style="color: #339933;">,</span> <span style="color: #339933;">&amp;</span><span style="color: #000088;">$params</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+    <span style="color: #000088;">$person</span> <span style="color: #339933;">=</span> R<span style="color: #339933;">::</span><span style="color: #004000;">load</span><span style="color: #009900;">(</span><span style="color: #0000ff;">'person'</span><span style="color: #339933;">,</span> <span style="color: #990000;">intval</span><span style="color: #009900;">(</span><span style="color: #000088;">$id</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+    <span style="color: #000088;">$app</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">render</span><span style="color: #009900;">(</span><span style="color: #cc66cc;">200</span><span style="color: #339933;">,</span> <span style="color: #009900;">[</span><span style="color: #0000ff;">'result'</span> <span style="color: #339933;">=&gt;</span> exportPerson<span style="color: #009900;">(</span><span style="color: #000088;">$person</span><span style="color: #009900;">)</span><span style="color: #009900;">]</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">}</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre></td></tr></tbody></table><p class="theCode" style="display:none;">$app-&gt;get('/person/:id/', $requestJSON, $validateToken, function ($id) use (&amp;$app, &amp;$params) {
+    $person = R::load('person', intval($id));
+    $app-&gt;render(200, ['result' =&gt; exportPerson($person)]);
+});</p></div>
+
+<p><b>Thumbnails using PHPImageWorkshop</b></p>
+<p>When viewing posts on the cleint, hexagon thumbnails are displayed to form a honeycomb. These thumbnails are generated using <a href="http://phpimageworkshop.com/">PHPImageWorkshop</a>. As an example, the following code loads a picture, crops it to the largest square possible, and then resizes it to 100×100 pixels. Finally, it save the file.</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tbody><tr><td class="code"><pre class="php" style="font-family:monospace;"><span style="color: #000088;">$layer</span> <span style="color: #339933;">=</span> ImageWorkshop<span style="color: #339933;">::</span><span style="color: #004000;">initFromPath</span><span style="color: #009900;">(</span><span style="color: #000088;">$file</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #000088;">$layer</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">cropMaximumInPixel</span><span style="color: #009900;">(</span><span style="color: #cc66cc;">0</span><span style="color: #339933;">,</span> <span style="color: #cc66cc;">0</span><span style="color: #339933;">,</span> <span style="color: #0000ff;">'MM'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #000088;">$layer</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">resizeInPixel</span><span style="color: #009900;">(</span><span style="color: #cc66cc;">100</span><span style="color: #339933;">,</span> <span style="color: #cc66cc;">100</span><span style="color: #009900;">)</span>
+<span style="color: #990000;">imagepng</span><span style="color: #009900;">(</span><span style="color: #000088;">$layer</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">getResult</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">,</span> <span style="color: #0000ff;">'thumb.png'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre></td></tr></tbody></table><p class="theCode" style="display:none;">$layer = ImageWorkshop::initFromPath($file);
+$layer-&gt;cropMaximumInPixel(0, 0, 'MM');
+$layer-&gt;resizeInPixel(100, 100)
+imagepng($layer-&gt;getResult(), 'thumb.png');</p></div>
+
+<p><b>Sentiment analysis through AlchemyAPI</b></p>
+<p>To form the honeycomb, all posts needed to be converted to thumbnails, including text. Simply displaying text in a small hexagon would not be effective – it would be too small and cramped to read. Instead, we wanted to display a preview of what the text may contain. We therefore form a preview comprising of the following:</p>
+<ul>
+<li><i>the key word</i>: what is the subject of the text? We discover this using keyword extraction.</li>
+<li><i>the mood</i>: how positive or negative is the text? We discover this using sentiment analysis.</li>
+</ul>
+<p>For both keyword extraction and sentiment analysis, we use <a href="http://www.alchemyapi.com/">AlchemyAPI</a>, which has been trained with vast amounts of data, such that it is ready to analyse data with diverse contexts. The sentiment is returned as a value between -1 and 1, which we use to adjust the hue of the hexagon, such that a negative mood is red, and a positive mood is green.</p>
+<table>
+<tbody>
+<tr>
+<td><a href="./Design Patterns, Libraries and APIs_files/r-1796636341535d5bd1495f56.43275819.png-100-cell.png"><img class="aligncenter size-full wp-image-683" alt="Analysis of &quot;Tango is awesome!&quot;" src="./Design Patterns, Libraries and APIs_files/r-1796636341535d5bd1495f56.43275819.png-100-cell.png" width="100" height="100" srcset="http://blog.soton.ac.uk/orion/files/2014/04/r-1796636341535d5bd1495f56.43275819.png-100-cell.png 100w, http://blog.soton.ac.uk/orion/files/2014/04/r-1796636341535d5bd1495f56.43275819.png-100-cell-80x80.png 80w" sizes="(max-width: 100px) 100vw, 100px"></a>Analysis of “Tango is awesome!”. Sentiment is 0.9 – extremely positive – so the background is green. The keyword is “Tango”.</td>
+<td><a href="./Design Patterns, Libraries and APIs_files/r-320563092535d5c7d064177.22638142.png-100-cell.png"><img class="aligncenter size-full wp-image-684" alt="Analysis of &quot;I hate orange!&quot;" src="./Design Patterns, Libraries and APIs_files/r-320563092535d5c7d064177.22638142.png-100-cell.png" width="100" height="100" srcset="http://blog.soton.ac.uk/orion/files/2014/04/r-320563092535d5c7d064177.22638142.png-100-cell.png 100w, http://blog.soton.ac.uk/orion/files/2014/04/r-320563092535d5c7d064177.22638142.png-100-cell-80x80.png 80w" sizes="(max-width: 100px) 100vw, 100px"></a>Analysis of “I hate orange!”. Sentiment is -0.8 – very negative – so the background is red. The keyword is “orange”.</td>
+<td><a href="./Design Patterns, Libraries and APIs_files/r-19386199945360f4a4d9bed3.48614102.png-100-cell.png"><img class="aligncenter size-full wp-image-685" alt="Analysis of &quot;i have a tv!&quot;" src="./Design Patterns, Libraries and APIs_files/r-19386199945360f4a4d9bed3.48614102.png-100-cell.png" width="100" height="100" srcset="http://blog.soton.ac.uk/orion/files/2014/04/r-19386199945360f4a4d9bed3.48614102.png-100-cell.png 100w, http://blog.soton.ac.uk/orion/files/2014/04/r-19386199945360f4a4d9bed3.48614102.png-100-cell-80x80.png 80w" sizes="(max-width: 100px) 100vw, 100px"></a>Analysis of “i have a tv”. Sentiment is 0.2 – fairly neutral – so the background is off-green. The keyword is “tv”.</td>
+</tr>
+</tbody>
+</table>
+<h3>Client</h3>
+<p>The client is the application which people will use to access LeapIn.it. We use HTML, CSS and JavaScript, and use Apache Cordova to package this as native Android and iPhone apps. Backbone is used to interface with the REST endpoint and Angular is used to generate DOM content.</p>
+<p><strong>Apache Cordova to create mobile apps</strong></p>
+<p><a href="https://cordova.apache.org/">Cordova</a> provides a wrapper for HTML, CSS and JavaScript, such that it may be packaged as a mobile app. It also exposes a hardware-level API which can be used within JavaScript.</p>
+<p>The process of converting a web application to a Cordova application is minimal – it simply needs an app name and icon.</p>
+<p>We use Apache Cordova to utilise the camera as a barcode scanner. The following code is responsible for that:</p>
+
+<div class="wp_syntax" style="position:relative;"><table><caption><a href="https://github.com/FlamingTempura/leapinit/blob/master/app/www/js/screens/scan.js">/leapinit/blob/master/app/www/js/screens/scan.js</a></caption><tbody><tr><td class="line_numbers"><pre>13
+14
+15
+</pre></td><td class="code"><pre class="javascript" style="font-family:monospace;">cordova.<span style="color: #660066;">plugins</span>.<span style="color: #660066;">barcodeScanner</span>.<span style="color: #660066;">scan</span><span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">function</span> <span style="color: #009900;">(</span>result<span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+	scan<span style="color: #009900;">(</span>result.<span style="color: #660066;">text</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span> <span style="color: #006600; font-style: italic;">// find a room for this code</span>
+<span style="color: #009900;">}</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre></td></tr></tbody></table><p class="theCode" style="display:none;">cordova.plugins.barcodeScanner.scan(function (result) {
+	scan(result.text); // find a room for this code
+});</p></div>
+
+<p><b>Backbone used as a REST client</b></p>
+<p>To interface with the REST endpoint on the server, <a href="http://backbonejs.org/">Backbone.js</a> is used. This provides an object mapper for models, allowing us to modify database records much like we would with RedBean on the server. As an example, the following will get and change a room title:</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tbody><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #006600; font-style: italic;">// Define the Rooms collection</span>
+<span style="color: #000066; font-weight: bold;">var</span> Rooms <span style="color: #339933;">=</span> Backbone.<span style="color: #660066;">Collection</span>.<span style="color: #660066;">extend</span><span style="color: #009900;">(</span><span style="color: #009900;">{</span>
+	url<span style="color: #339933;">:</span> <span style="color: #3366CC;">'http://leapin.it/api/rooms'</span>
+<span style="color: #009900;">}</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #006600; font-style: italic;">// Instantiate the collection</span>
+<span style="color: #000066; font-weight: bold;">var</span> rooms <span style="color: #339933;">=</span> <span style="color: #000066; font-weight: bold;">new</span> Rooms<span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #006600; font-style: italic;">// Fetch all rooms</span>
+rooms.<span style="color: #660066;">fetch</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span>.<span style="color: #660066;">then</span><span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">function</span> <span style="color: #009900;">(</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+	<span style="color: #006600; font-style: italic;">// Get room with ID 10</span>
+	<span style="color: #000066; font-weight: bold;">var</span> myroom <span style="color: #339933;">=</span> people.<span style="color: #000066; font-weight: bold;">get</span><span style="color: #009900;">(</span><span style="color: #CC0000;">10</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #006600; font-style: italic;">// Get the title</span>
+	<span style="color: #000066; font-weight: bold;">var</span> title <span style="color: #339933;">=</span> myroom.<span style="color: #000066; font-weight: bold;">get</span><span style="color: #009900;">(</span><span style="color: #3366CC;">'title'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #006600; font-style: italic;">// Change the title</span>
+	myroom.<span style="color: #660066;">save</span><span style="color: #009900;">(</span><span style="color: #009900;">{</span> title<span style="color: #339933;">:</span> <span style="color: #3366CC;">'myroom'</span> <span style="color: #009900;">}</span><span style="color: #009900;">)</span>.<span style="color: #660066;">then</span><span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">function</span> <span style="color: #009900;">(</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+		console.<span style="color: #660066;">log</span><span style="color: #009900;">(</span><span style="color: #3366CC;">'SAVED!'</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #009900;">}</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">}</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre></td></tr></tbody></table><p class="theCode" style="display:none;">// Define the Rooms collection
+var Rooms = Backbone.Collection.extend({
+	url: 'http://leapin.it/api/rooms'
+});
+// Instantiate the collection
+var rooms = new Rooms();
+// Fetch all rooms
+rooms.fetch().then(function () {
+	// Get room with ID 10
+	var myroom = people.get(10);
+	// Get the title
+	var title = myroom.get('title');
+	// Change the title
+	myroom.save({ title: 'myroom' }).then(function () {
+		console.log('SAVED!');
+	});
+});</p></div>
+
+<p><b>Angular used to generate DOM</b></p>
+<p><a href="https://angularjs.org/">Angular</a> provides HTML markup to generate the DOM automatically when data has loaded. For example, the following will generate a list of rooms:</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tbody><tr><td class="code"><pre class="html" style="font-family:monospace;">&lt;ul class="rooms"&gt;
+	&lt;li&gt;&lt;a href="{{ room.url }}"&gt;{{ room.title }}&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</pre></td></tr></tbody></table><p class="theCode" style="display:none;">&lt;ul class="rooms"&gt;
+	&lt;li&gt;&lt;a href="{{ room.url }}"&gt;{{ room.title }}&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</p></div>
+
+<p><b>Other libraries used on the client</b></p>
+<ul>
+<li><a href="http://jquery.com/"><b>jQuery</b></a> is used for DOM selection.</li>
+<li><a href="http://fontawesome.io/"><b>Font Awesome</b></a> is a collection of icons which are used throughout the prototype.</li>
+<li><a href="http://underscorejs.org/"><b>Underscore</b></a> provides a number of features for functional iteration through arrays.</li>
+<li><a href="http://lesscss.org/"><b>Less</b></a> is used to produce hierarchical CSS</li>
+<li><a href="http://lesshat.madebysource.com/"><b>Lesshat</b></a> provides a number of templates for use within LESS.</li>
+<li><a href="http://momentjs.com/"><b>moment.js</b></a> converts unix timestamps into meaningful strings (for example, “one week ago”).</li>
+<li><a href="https://github.com/blueimp/jQuery-File-Upload"><b>jQuery-file-upload</b></a> provides a convenient file upload utility which we use for creating posts.</li>
+</ul>
+<p>&nbsp;</p>
+<h4>Conclusion</h4>
+<p>The use of existing design patterns, libraries and API’s has greatly reduced the complexity of development, allowing us to develop three prototypes in a short period of time.</p>
+					
+</body>
+</html>

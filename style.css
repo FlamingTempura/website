@@ -1,0 +1,268 @@
+@font-face {
+  font-family: 'Economica';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Economica Bold'), local('Economica-Bold'), url(/media/fonts/Economica-Bold.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 300;
+	src: local('Roboto Light'), local('Roboto-Light'), url('/media/fonts/Roboto-Light.woff') format('woff');
+}
+@font-face {
+	font-family: 'EB Garamond';
+	font-style: normal;
+	font-weight: 400;
+	src: local('EB Garamond Regular'), local('EBGaramond-Regular'),
+	     url('/media/fonts/EBGaramond-Regular.ttf') format('truetype');
+}
+@font-face {
+	font-family: 'EB Garamond';
+	font-style: normal;
+	font-weight: 600;
+	src: local('EB Garamond Regular SemiBold'), local('EBGaramond-Regular-SemiBold'),
+	     url('/media/fonts/EBGaramond-SemiBold.ttf') format('truetype');
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body.article {
+	font-family: 'EB Garamond', serif;
+	font-size: 20px;
+	line-height: 1.6em;
+	color: #333;
+	margin: 30px auto;
+	padding: 12px;
+	max-width: 800px;
+	border-top: 20px solid #eee;
+	border-bottom: 20px solid #eee;
+}
+body.home {
+	font-family: 'Roboto', sans-serif;
+	font-size: 15px;
+	line-height: 1.4em;
+	color: #333;
+	margin: 0;
+}
+table {
+	font-family: 'Roboto', sans-serif;
+	font-size: 0.7em;
+}
+table td, table th {
+	padding: 0 18px 0 0;
+}
+
+a {
+	color: #234C99;
+	/*color: #3659ff;*/
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+p {
+	margin: 0.2em 0 1em 0;
+}
+
+img {
+	border: 0;
+	max-width: 100%;
+}
+
+h1, h2, h3, h4 {
+	font-weight: 700;
+	line-height: 1em;
+	margin: 0;
+	font-family: 'Economica', sans-serif;
+	line-height: 1.3em;
+	color: #444;
+}
+h1 a, h2 a, h3 a, h4 a {
+	color: inherit;
+}
+.home h1, .home h2, .home h3, .home h4 {
+	font-weight: 300;
+}
+h1 {
+	font-size: 2em;
+	margin: 0 0 0.5em 0;
+}
+.article h1 {
+	font-size: 3em;
+}
+h2 {
+	font-size: inherit;
+	margin: 0 0 0.5em 0;
+	padding: 0;
+	margin-top: 1em;
+}
+.article h2 {
+	font-style: italic;
+}
+h3 {
+	font-size: 1.6em;
+	padding-top: 24px;
+	margin: 16px 0 20px 0;
+	font-size: 30px;
+}
+.home h3 {
+	border-top: 3px dashed #f0f0f0;
+}
+
+h3 em {
+	display: block;
+	font-size: 15px;
+	font-weight: normal;
+}
+
+h4 {
+	font-size: 1.1em;
+	margin: 1em 0 0.5em 0;
+}
+
+[hidden] {
+	display: none;
+}
+.page {
+	margin: 40px auto;
+	padding: 20px;
+	max-width: 900px;
+	border-bottom: 1px solid #f0f0f0;
+}
+.home header {
+	display: flex;
+}
+.home header img {
+	width: 180px;
+	height: 180px;
+	flex: 0 0 auto;
+}
+.home header .bio {
+	flex: 1 1 auto;
+	margin-right: 28px;
+}
+.home header .links a {
+	padding: 0 10px 0 0;
+}
+.home header .links a::before {
+	content: '[ ';
+	font-weight: bold;
+	font-size: 0.8em;
+}
+.home header .links a::after {
+	content: ' ]';
+	font-weight: bold;
+	font-size: 0.8em;
+}
+
+.article header {
+	border-bottom: 3px solid #eee;
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+}
+.article header p {
+	font-size: 1.2em;
+	margin: 1em 0 -0.2em 0;
+}
+
+section {
+	display: flex;
+}
+section .media {
+	width: 400px;
+	flex: 0 0 auto;
+}
+section .content {
+	flex: 1 1 auto;
+	min-width: 400px;
+	margin-right: 28px !important;
+}
+
+ul.list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	font-size: 0.9em;
+}
+ul.list li {
+	margin: 0 0 12px 0;
+}
+figure {
+	margin: 0;
+}
+figcaption {
+	display: block;
+	font-size: 0.85em;
+	padding: 0 0 20px;
+}
+figcaption::before {
+	content: 'Above: ';
+	font-weight: 600;
+}
+.attribution {
+	font-size: 11px;
+	color: #999;
+}
+.attribution a {
+	color: inherit;
+}
+
+blockquote {
+	position: relative;
+	margin: 2em 0 2em 40px;
+	color: #666;
+}
+blockquote:before {
+	content: '\201C';
+	color: #eee;
+	font-size: 80px;
+	position: absolute;
+	line-height: 60px;
+	left: -40px;
+}
+
+.video {
+	position: relative;
+	width: 400px;
+	/*height: 210px;*/
+	display: block;
+}
+.video img {
+	width: 100%;
+	height: 100%;
+}
+.video::before {
+	content: '';
+	position: absolute;
+	background-color: rgba(40, 40, 40, 0.8);
+	transition: background-color ease 0.2s;
+	width: 70px;
+	height: 50px;
+	top: 80px;
+	left: 165px;
+	border-radius: 15px;
+}
+
+.video::after {
+	content: '';
+	position: absolute;
+	width: 0;
+	height: 0;
+	top: 95px;
+	left: 190px;
+	border-left: 25px solid white;
+	border-top: 10px solid transparent;
+	border-bottom: 10px solid transparent;
+	border-right: 0 solid transparent;
+}
+.video:hover::before {
+	background-color: red;
+	transition: background-color ease 0.05s;
+}
+.publisher {
+	display: inline;
+}

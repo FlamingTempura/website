@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Linking similar rooms and room clustering</title>
+	<link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body class="article">
+
+	<header>
+		<h2>Blog post</h2>
+		<h1>Linking similar rooms and room clustering</h1>
+		<h4>By Peter West &bullet; 7th April 2014 12:37</h4>
+		<small><a href="http://blog.soton.ac.uk/orion/design/linking-similar-rooms-and-room-clustering/">Originally posted</a> for the <div class="publisher">Web Science COMP6051 module, University of Southampton</div></small>
+	</header>
+
+	<p>LeapIn.it will allow people to “leap in” to rooms based around niche interests simply by scanning barcodes (or QR-codes) that may be found on relevant material (such as books and posters). However, it is reasonable to expect that one subject may have multiple barcodes. For example, the DVD and Bluray releases of the film&nbsp;<em>Inception</em>&nbsp;may have different barcodes. In this case, there will be two rooms for the same topic.</p>
+
+	<p>One solution may be to simply introduce some way to indicate duplicate rooms, much like the notion of <a href="http://sameas.org/">“sameAs” within Semantic Web research</a>. However, this presents two problems. First, who mark the duplicates? A person would need to know about both rooms in order to do so. Second, it may be unclear if two rooms should be considered “duplicates”. For example, what is to say that the rooms above (the Inception DVD and Bluray rooms) are not about their the film’s release on the respective mediums? Due to the differing contexts in which the users first entered the rooms, the rooms may be about subtly different things.</p>
+
+	<p>Still, a user may benefit from viewing the content of similar rooms, and we wish to avoid massive fragmentation of users across different rooms about similar subjects. Therefore, we propose to “link” together similar rooms using clustering algorithms.</p>
+
+	<h3>Clustering</h3>
+
+	<p>To cluster rooms, we first need to understand what each room is about. We could infer this from the original scanned source (i.e., the barcode or QR-code), however this may not be dereferencable to a particular subject (e.g, a barcode just decodes to a number). Alternatively, we can “learn” what the subject of a room is from the content that has been posted within the room. This would also present challenges when trying to understand the content of rich media, such as pictures and videos.&nbsp;Assuming we use the latter process on just textual content within the room, we can plot the rooms within a vector space.</p>
+
+	<p>The vector space is a multi-dimensional space, where each dimension is a general subject (for example, action, news, tools). Each room has a value within each dimension, thereby placing similar rooms together in the vector space, as shown in the illustration below.</p>
+
+	<figure id="attachment_374" class="wp-caption aligncenter" style="width: 614px"><a href="./Linking similar rooms and room clustering_files/Room-clustering-2.png"><img class="size-full wp-image-374" alt="An two dimensional vector space, showing the dimensions of &quot;Product: Grocery&quot; and &quot;Genre: Action&quot;. Rooms about groceries will appear nearer the top, while rooms which are about action genres (e.g. action films) will be off to the right. We can thus cluster rooms that are similar in those respects. Realistically, two dimensions is not enough to make such inferences - many more dimensions would be required." src="./Linking similar rooms and room clustering_files/Room-clustering-2.png" width="614" height="375" srcset="http://blog.soton.ac.uk/orion/files/2014/04/Room-clustering-2.png 614w, http://blog.soton.ac.uk/orion/files/2014/04/Room-clustering-2-300x183.png 300w" sizes="(max-width: 614px) 100vw, 614px"></a><figcaption class="wp-caption-text">An two dimensional vector space, showing the dimensions of “Product: Grocery” and “Genre: Action”. Rooms about groceries will appear nearer the top, while rooms which are about action genres (e.g. action films) will be off to the right. We can thus cluster rooms that are similar in those respects. Realistically, two dimensions is not enough to make such inferences – many more dimensions would be required.</figcaption></figure>
+
+	<p>We can then cluster similar rooms by looking at which rooms are closest together. For the user, we may provide links to similar rooms, or simply post content from other rooms in a peripheral layer.</p>
+					
+</body>
+</html>

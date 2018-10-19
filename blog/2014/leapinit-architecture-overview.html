@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Architecture overview</title>
+	<link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body class="article">
+
+	<header>
+		<h2>Blog post</h2>
+		<h1>Architecture overview</h1>
+		<h4>By Peter West &bullet; 4th April 2014 22:11</h4>
+		<small><a href="http://blog.soton.ac.uk/orion/design/architecture-overview/">Originally posted</a> for the <div class="publisher">Web Science COMP6051 module, University of Southampton</div></small>
+	</header>
+		
+	<p>This post will detail the basic components and architecture of the planned system.</p>
+
+	<h3>Web as a platform</h3>
+
+	<p>LeapIn.it is aimed primarily at mobile devices. A major issue with developing for mobiles is the proliferation of mobile devices – to reach 90% of active mobile users, <a href="http://blog.newrelic.com/2013/05/23/mobile-device-fragmentation-its-only-going-to-get-worse/">more that 330 devices must be considered</a>. The differences between these devices include screen-size, inputs, programming language and architecture. For example, iPhone requires apps be built using Objective-C, while Android required apps to be in Java.&nbsp;Designing for such a vast number of mobile devices thus creates a challenge.</p>
+
+	<p>One solution to this, which we intend to pursue, is to use the Web as a platform. By building LeapIn.it as a web-based app, the app may be accessed within mobile web browsers, which addresses the problem of implementation disparity. Through using HTML, CSS and JavaScript, and through using web design responsive to different screen-sizes, developing for many mobile devices becomes less demanding.&nbsp;Furthermore, there is a selection of tools which are able to “wrap” web-based apps, such that they appear as native applications. <a href="https://cordova.apache.org/">Apache Cordova</a>, <a href="http://phonegap.com/">Adobe Phonegap</a> and <a href="http://www.appcelerator.com/">Appcelerator</a> are examples of this. Apache Cordova is free and open source, so we will use this to create native apps.</p>
+
+	<h3>Server-Client architecture</h3>
+
+	<p>One component of LeapIn.it which can be immediately identified is the client. The client is the web-based application which the user will access. However, the data on users, rooms etc will need to be stored somewhere. A server is ideal for this – the data is stored centrally to ensure it can be accessed by everyone (within the constraints of permissions). The server consists of a database and an interface to the database which the client can use to retrieve data.</p>
+
+	<p>However, centralised architectures do present a number of issues:</p>
+
+	<ul>
+
+		<li><i>security</i> – all information about all users is stored in one place, creating one target for attack. This problem has recieved widespread attention recently due to reports of <a href="http://www.theguardian.com/world/interactive/2013/nov/01/prism-slides-nsa-document">government surveillance</a>.</li>
+
+		<li><i>scalability</i> – the servers must be able to expand to satisfy demand (e.g. more users, more content). However, servers must be financed, so there must be a source of finance which also increases.</li>
+
+		<li><i>accountability and intellectual property</i> – the content which is held on the server is provided by users, and should be their responsibility. However, the data is “physically” located in the property of LeapIn.it, so it is unclear who is accountable for it. There have been numerous legal cases involving copyright law and centralised storage, such as <a href="http://en.wikipedia.org/wiki/Megaupload_legal_case">Megaupload</a></li>
+
+	</ul>
+
+	<p>To address these issues, we would suggest that, as future work, LeapIn.it move to a more decentralised architecture, perhaps inspired by peer-to-peer systems such as bittorrent or diaspora. But this is a vast field of research in itself, and will need to be considered at length.</p>
+
+	<p>Our server-client architecture is thus formed as below:</p>
+
+	<figure>
+		<img src="/media/Architecture-overview.png">
+		<figcaption>Server-client architecture overview</figcaption>
+	</figure>
+
+	<p>In order to ensure a robust implementation, we will build on existing tried-and-tested technologies:</p>
+
+	<ul>
+
+		<li>The database will be MySQL.</li>
+
+		<li>The server will be written in PHP, running on Apache.</li>
+
+		<li>The client will be, as discussed above, a web-based application.</li>
+
+		<li>The server will communicate with the database via an ORM (Object-Relational Mapping). This provides an object-oriented interface to the database, making code more readable and more secure (e.g. SQL queries to not need to be written, reducing the possibility of SQL injection). We will use <a href="http://redbeanphp.com/">RedBeanPHP</a>, an ORM for PHP which allows interfacing with a MySQL database.</li>
+
+		<li>The client will communicate with the server using REST (Representational state transfer). This is a design pattern for hypermedia systems, which advocates providing individual resources (e.g., people) with unique URLs, and using those URLs to exchange structured information. This will be discussed at length later in the implementation phase. For PHP, <a href="http://www.slimframework.com/">Slim.php</a> will be used to create a REST endpoint. To allow the client to utilise the REST endpoint, <a href="http://backbonejs.org/">Backbone.js</a> will be used.</li>
+
+	</ul>
+					
+</body>
+</html>
