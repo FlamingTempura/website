@@ -13,57 +13,52 @@
 		<h4>By Peter West &bullet; 29th April 2014 10:27</h4>
 		<small><a href="http://blog.soton.ac.uk/orion/implementation/code-metrics/">Originally posted</a> for the <div class="publisher">Web Science COMP6051 module, University of Southampton</div></small>
 	</header>
-		
-					<p>Throughout implementing the prototypes, we’ve employed a number of testing methodologies to ensure that the product is of a high quality. In this post, we’ll discuss four methodologies we have used: regression testing, code modularity, code quality checking and code metric monitoring.</p>
-<h3>Regression testing</h3>
-<p>After each significant change was made to the code, the prototype would be compiled into an android app and run through a number of scenarios on a phone. The purpose of testing in this way was to make sure that any changes did not break features which previously worked.</p>
-<h3>Code modularity</h3>
-<p>We made a number of design decisions to ensure that the code would be modular and easily maintainable:</p>
-<ul>
-<li>Adopting the server-client architecture leads to a disconnect of the user and the database.</li>
-<li>Using object oriented languages leads to modular code. In particular, the use of RedBean ORM and Backbone.js led to separately defined models, making it easily maintainable.</li>
-<li>Separation of DOM and JavaScript using jQuery and Angular reduces the coupling that is <a href="https://stackoverflow.com/questions/9154586/is-loose-coupling-possible-for-a-web-app">generally prevalent</a> with web applications.</li>
-</ul>
-<h3>Code quality checking</h3>
-<p>The design of JavaScript can make it susceptible to common mistakes. In particular, it doesn’t check if a variable hasn’t been declared, so if it is written to, it will be <a href="http://www.yuiblog.com/blog/2006/06/01/global-domination/">declared in the global scope.</a></p>
-<p>To alleviate these issues, we used Douglas Crockford’s book <a href="http://shop.oreilly.com/product/9780596517748.do"><i>JavaScript: The Good Parts</i></a>. He advises on design patterns, and advocates using a code checking tool, <a href="http://www.jslint.com/"><i>JSLint</i></a>. We used this to ensure that we did not make some common mistakes.</p>
-<h3>Code metric monitoring</h3>
-<p>As the amount of code increases, more time needs to be spent ensuring that it is of a high standard. We therefore imposed restrictions on the number of lines of code (in PHP and JavaScript) we would write, in order to ensure adequate time for testing. The following table shows the limits and final line counts of the prototype:</p>
-<table>
-<tbody><tr>
-<th>Language</th>
-<th>Line count limit</th>
-<th>Final line count</th>
-</tr>
-<tr>
-<td>PHP</td>
-<td>1000</td>
-<td>691</td>
-</tr>
-<tr>
-<td>JavaScript</td>
-<td>1000</td>
-<td>944</td>
-</tr>
-<tr>
-<td>LESS</td>
-<td>N/A</td>
-<td>767</td>
-</tr>
-<tr>
-<td>HTML</td>
-<td>N/A</td>
-<td>372</td>
-</tr>
-<tr>
-<td>XML</td>
-<td>N/A</td>
-<td>13</td>
-</tr>
-<tr>
-<td><b>Total</b></td>
-<td><b>3000</b></td>
-<td><b>2787</b></td></tr>
-</tbody></table><p>Code statistics generated using <a href="http://cloc.sourceforge.net/">CLOC</a></p><h3>Conclusion</h3><p>Using these methodologies has meant that the prototype is of a high standard, making it maintainable and reliable. This will be particularly useful in future applications of LeapIn.it, when other developers may need to access the code.</p>
+	
+	<p>Throughout implementing <a href="http://blog.soton.ac.uk/orion">LeapIn.it</a>, our social network prototype, we've employed a number of testing and code quality methodologies to ensure that the product is of a high quality. This post discusses four methodologies we have used: regression testing, code modularity, code quality checking, and code metric monitoring.</p>
+	
+	<h3>Regression testing</h3>
+	
+	<p>After each significant change was made to the code, the prototype would be compiled as an Android app and run through a number of scenarios on a phone. The purpose of testing in this way was to make sure that any changes did not break features which previously worked.</p>
+	
+	<h3>Code modularity</h3>
+	
+	<p>We made a number of design decisions to ensure that the code would be modular and easily maintainable:</p>
+	
+	<ul>
+		<li>Adopting the server-client architecture leads to a disconnect of the user and the database.</li>
+		<li>Using object oriented languages leads to modular code. In particular, the use of RedBean ORM and Backbone.js led to separately defined models, making it easily maintainable.</li>
+		<li>Separation of DOM and JavaScript using jQuery and Angular reduces the coupling that is <a href="https://stackoverflow.com/questions/9154586/is-loose-coupling-possible-for-a-web-app">generally prevalent</a> with web applications.</li>
+	</ul>
+	
+	<h3>Code quality checking</h3>
+	
+	<p>The design of JavaScript can make it susceptible to common mistakes. In particular, it doesn’t check if a variable hasn't been declared, so if it is written to, it will be <a href="http://www.yuiblog.com/blog/2006/06/01/global-domination/">declared in the global scope.</a></p>
+	
+	<p>To alleviate these issues, we used Douglas Crockford's book <a href="http://shop.oreilly.com/product/9780596517748.do"><i>JavaScript: The Good Parts</i></a>. He advises on design patterns, and advocates using a code checking tool, <a href="http://www.jslint.com/"><i>JSLint</i></a>. We used this to ensure that we did not make some common mistakes.</p>
+	
+	<h3>Code metric monitoring</h3>
+	
+	<p>As the amount of code increases, more time needs to be spent ensuring that it is of a high standard. We therefore imposed restrictions on the number of lines of code (in PHP and JavaScript) we would write, in order to ensure adequate time for testing. The following table shows the limits and final line counts of the prototype:</p>
+	
+	<table>
+		<thead>
+			<tr><th>Language</th><th>Line count limit</th><th>Final line count</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>PHP</td><td>1000</td><td>691</td></tr>
+			<tr><td>JavaScript</td><td>1000</td><td>944</td></tr>
+			<tr><td>LESS</td><td>N/A</td><td>767</td></tr>
+			<tr><td>HTML</td><td>N/A</td><td>372</td></tr>
+			<tr><td>XML</td><td>N/A</td><td>13</td></tr>
+			<tr><th>Total</th><th>3000</th><th>2787</th></tr>
+		</tbody>
+	</table>
+	
+	<p>Code statistics were generated using <a href="http://cloc.sourceforge.net/">CLOC</a>.</p>
+	
+	<h3>Conclusion</h3>
+	
+	<p>Using these methodologies has meant that the prototype is of a high standard, making it maintainable and reliable. This will be particularly useful in future applications of LeapIn.it, when other developers may need to access the code.</p>
+	
 </body>
 </html>
