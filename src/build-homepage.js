@@ -57,11 +57,11 @@ bibs.publications.forEach(item => {
 	if (item.type === 'publisher') {
 		citation.push(`. <em>${prop(item, 'publisher')}</em>`);
 	}
-	if (prop(item, 'slides')) {
-		citation.push(` [<a href="${prop(item, 'slides')}">Slides</a>]`);
-	}
 	if (prop(item, 'manuscript')) {
 		citation.push(` [<a href="${prop(item, 'manuscript')}">Manuscript</a>]`);
+	}
+	if (prop(item, 'slides')) {
+		citation.push(` [<a href="${prop(item, 'slides')}">Slides</a>]`);
 	}
 	
 	let str = citation.join('');
