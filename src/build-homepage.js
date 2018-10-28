@@ -54,9 +54,14 @@ bibs.publications.forEach(item => {
 	if (item.type === 'article') {
 		citation.push(` in <em>${prop(item, 'journal')}</em>`);
 	}
-
 	if (item.type === 'publisher') {
 		citation.push(`. <em>${prop(item, 'publisher')}</em>`);
+	}
+	if (prop(item, 'slides')) {
+		citation.push(` [<a href="${prop(item, 'slides')}">Slides</a>]`);
+	}
+	if (prop(item, 'manuscript')) {
+		citation.push(` [<a href="${prop(item, 'manuscript')}">Manuscript</a>]`);
 	}
 	
 	let str = citation.join('');
@@ -96,10 +101,7 @@ fs.readdirSync(path.resolve(__dirname, '../blog')).map(year => {
 
 bibs.blog.sort((a, b) => b.date - a.date).forEach(post => {
 	let citation = [];
-
-
 	citation.push(`${moment(post.date).format('D MMM YYYY')} - `);
-
 	citation.push(`<a href="${prop(post, 'url')}">`);
 	citation.push(prop(post, 'title'));
 	citation.push(`</a>`);
