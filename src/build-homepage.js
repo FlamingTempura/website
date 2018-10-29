@@ -18,7 +18,7 @@ const prop = (item, key) => {
 	if (key === 'author') {
 		val = (val || '').split(' and ').map(name => {
 			let [last, first] = name.split(', ');
-			return `${first} ${last}`;
+			return `${first || ''} ${last}`;
 		}).join(', ');
 	}
 	val = String(val).replace('--', '&mdash;');
