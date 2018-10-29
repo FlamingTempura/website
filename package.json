@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-homepage": "node ./src/build-homepage.js"
+    "build": "node ./src/build-homepage.js"
   },
   "author": "",
   "license": "ISC",

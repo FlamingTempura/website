@@ -63,6 +63,9 @@ bibs.publications.forEach(item => {
 	if (prop(item, 'slides')) {
 		citation.push(` [<a href="${prop(item, 'slides')}">Slides</a>]`);
 	}
+	if (prop(item, 'poster')) {
+		citation.push(` [<a href="${prop(item, 'poster')}">Poster</a>]`);
+	}
 	
 	let str = citation.join('');
 	html = html.replace(/(<!--PUBLICATIONS-->)/, `<li>${str}.</li>\n${indent}$1`);
