@@ -11,7 +11,14 @@ let bibs = {};
 	bibs[file] = bibtex.parse(bib).entries;
 });
 
-let html = fs.readFileSync(path.resolve(__dirname, 'template.html'), 'utf8');
+let home = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8')
+	.replace(/(<!--PUBLICATIONS-->).*(<!--PUBLICATIONS END-->)/s, '$1$2')
+	.replace(/(<!--BLOG-->).*(<!--BLOG END-->)/s, '$1$2')
+	.replace(/(<!--PROGRAMMING-->).*(<!--PROGRAMMING END-->)/s, '$1$2');
+
+
+let blog = fs.readFileSync(path.resolve(__dirname, '../blog/index.html'), 'utf8')
+	.replace(/(<!--BLOG-->).*(<!--BLOG END-->)/s, '$1$2');
 
 const prop = (item, key) => {
 	let val = (item.properties[key] || {}).value || '';
@@ -68,12 +75,11 @@ bibs.publications.forEach(item => {
 	}
 	
 	let str = citation.join('');
-	html = html.replace(/(<!--PUBLICATIONS-->)/, `<li>${str}.</li>\n${indent}$1`);
+	home = home.replace(/(<!--PUBLICATIONS END-->)/, `<li>${str}.</li>\n${indent}$1`);
 });
 
 let months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
               'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-
 
 bibs.blog.forEach(item => {
 	item.date = new Date(prop(item, 'year'), months.indexOf(prop(item, 'month')), prop(item, 'day'));
@@ -81,28 +87,34 @@ bibs.blog.forEach(item => {
 
 // automatically generate bib entries for blogs
 fs.readdirSync(path.resolve(__dirname, '../blog')).map(year => {
-	fs.readdirSync(path.resolve(__dirname, `../blog/${year}`)).map(filename => {
-		let post = fs.readFileSync(path.resolve(__dirname, `../blog/${year}/${filename}`), 'utf8');
-		let date = new Date();
-		let datematch = post.match(/\d+(st|nd|rd|th) \w+ \d\d\d\d \d\d:\d\d/);
+	let dir = path.resolve(__dirname, `../blog/${year}`);
+	if (!fs.statSync(dir).isDirectory()) { return; }
+	fs.readdirSync(dir).map(filename => {
+		let post = fs.readFileSync(path.resolve(dir, filename), 'utf8'),
+			date = new Date(),
+			datematch = post.match(/\d+(st|nd|rd|th) \w+ \d\d\d\d \d\d:\d\d/);
 		if (datematch) {
 			date = moment(datematch[0], 'Do MMMM YYYY HH:mm').toDate();
 		}
-		let titlematch = post.match(/<h1>(.*)<\/h1>/);
-		let publisherMatch = post.match(/<div class="publisher">(.*)<\/div>/);
+		let titlematch = post.match(/<h1>(.*)<\/h1>/),
+			publisherMatch = post.match(/<div class="publisher">(.*)<\/div>/),
+			picMatch = post.match(/<img [^>]*src="([^"]*)"/),
+			introMatch = post.match(/<p>(.*)<\/p>/);
 
 		bibs.blog.push({
 			date,
 			properties: {
 				url: { value: `/blog/${year}/${filename}` },
 				title: { value: titlematch[1] },
-				publisher: publisherMatch ? { value: publisherMatch[1] } : null
+				publisher: publisherMatch ? { value: publisherMatch[1] } : null,
+				pic: picMatch ? { value: picMatch[1] } : null,
+				intro: introMatch ? { value: introMatch[1] } : null
 			}
 		});
 	});
 });
 
-bibs.blog.sort((a, b) => b.date - a.date).forEach(post => {
+bibs.blog.sort((a, b) => b.date - a.date).slice(0, 7).forEach(post => {
 	let citation = [];
 	citation.push(`${moment(post.date).format('D MMM YYYY')} - `);
 	citation.push(`<a href="${prop(post, 'url')}">`);
@@ -114,9 +126,8 @@ bibs.blog.sort((a, b) => b.date - a.date).forEach(post => {
 	}
 	
 	let str = citation.join('');
-	html = html.replace(/(<!--BLOG-->)/, `<li>${str}.</li>\n${indent}$1`);
+	home = home.replace(/(<!--BLOG END-->)/, `<li>${str}.</li>\n${indent}$1`);
 });
-
 
 bibs.programming.forEach(item => {
 	let citation = [];
@@ -125,7 +136,40 @@ bibs.programming.forEach(item => {
 	citation.push(`</a>`);
 	citation.push(` (${prop(item, 'year')})`);
 	let str = citation.join('');
-	html = html.replace(/(<!--PROGRAMMING-->)/, `<li>${str}.</li>\n${indent}$1`);
+	home = home.replace(/(<!--PROGRAMMING END-->)/, `<li>${str}.</li>\n${indent}$1`);
 });
 
-fs.writeFileSync(path.join(__dirname, '../index.html'), html, 'utf8');
+fs.writeFileSync(path.join(__dirname, '../index.html'), home, 'utf8');
+
+
+bibs.blog.sort((a, b) => b.date - a.date).forEach(post => {
+	let citation = [];
+
+	citation.push(`<h3 class="title"><a href="${prop(post, 'url')}">`);
+	citation.push(prop(post, 'title'));
+	citation.push(`</a></h3>`);
+
+	citation.push(`<div class="meta">`);
+	citation.push(moment(post.date).format('D MMM YYYY'));
+	
+	if (prop(post, 'publisher')) {
+		citation.push(` &bullet; Posted to ${prop(post, 'publisher')}`);
+	}
+
+	citation.push('</div>');
+
+	if (prop(post, 'pic')) {
+		citation.push(`<img src="${prop(post, 'pic')}">`);
+	}
+
+	if (prop(post, 'intro')) {
+		citation.push(`<p>${prop(post, 'intro')}</p>`);
+		citation.push(`<a class="readmore" href="${prop(post, 'url')}">Read more</a>`);
+	}
+	
+	let str = citation.join('');
+	blog = blog.replace(/(<!--BLOG END-->)/, `<li>${str}</li>\n${indent}$1`);
+});
+
+
+fs.writeFileSync(path.join(__dirname, '../blog/index.html'), blog, 'utf8');
