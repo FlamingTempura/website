@@ -114,19 +114,28 @@ fs.readdirSync(path.resolve(__dirname, '../blog')).map(year => {
 	});
 });
 
-bibs.blog.sort((a, b) => b.date - a.date).slice(0, 7).forEach(post => {
-	let citation = [];
-	citation.push(`${moment(post.date).format('D MMM YYYY')} - `);
-	citation.push(`<a href="${prop(post, 'url')}">`);
-	citation.push(prop(post, 'title'));
-	citation.push(`</a>`);
-	
-	if (prop(post, 'publisher')) {
-		citation.push(` <em>Posted to ${prop(post, 'publisher')}</em>`);
+let sortedBlog = bibs.blog.sort((a, b) => b.date - a.date);
+
+sortedBlog.slice(0, 9).forEach((post, i) => {
+	if (i === 8) {
+		post = bibs.blog.find(p => prop(p, 'url') === '/blog/2014/virtual-personal-assistants.html');
 	}
+	let citation = [];
+	
+	citation.push(`<a href="${prop(post, 'url')}">`);
+	citation.push(`<img src="${prop(post, 'pic')}">`);
+	citation.push(`<div class="title">${prop(post, 'title')}</div>`);
+	citation.push(`<div class="meta">`);
+	if (prop(post, 'publisher')) {
+		citation.push(`Posted to ${prop(post, 'publisher')} &bullet; `);
+	}
+	citation.push(moment(post.date).format('D MMM YYYY'));
+	citation.push(`</div>`);
+	citation.push(`</a>`);
+
 	
 	let str = citation.join('');
-	home = home.replace(/(<!--BLOG END-->)/, `<li>${str}.</li>\n${indent}$1`);
+	home = home.replace(/(<!--BLOG END-->)/, `<li>${str}</li>\n${indent}$1`);
 });
 
 bibs.programming.forEach(item => {
@@ -142,7 +151,7 @@ bibs.programming.forEach(item => {
 fs.writeFileSync(path.join(__dirname, '../index.html'), home, 'utf8');
 
 
-bibs.blog.sort((a, b) => b.date - a.date).forEach(post => {
+sortedBlog.forEach(post => {
 	let citation = [];
 
 	citation.push(`<h3 class="title"><a href="${prop(post, 'url')}">`);

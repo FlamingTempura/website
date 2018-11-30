@@ -211,6 +211,36 @@ figcaption::before {
 .attribution a {
 	color: inherit;
 }
+ul.blog {
+	display: flex;
+	flex-wrap: wrap;
+}
+ul.blog li {
+	width: 30%;
+	flex: 1 0 auto;
+	margin: 0 12px 0 0;
+}
+ul.blog li img {
+	width: 100%;
+	height: 180px;
+	object-fit: cover;
+	border: 1px solid #ddd;
+	margin: 12px 0 0 0;
+}
+ul.blog li:last-child {
+	width: 100%;
+	text-align: right;
+	font-weight: bold;
+}
+ul.blog li .title {
+	font-weight: bold;
+	color: #333;
+	margin: 4px 0;
+}
+ul.blog li .meta {
+	color: #333;
+	font-size: 12px;
+}
 
 blockquote {
 	position: relative;
