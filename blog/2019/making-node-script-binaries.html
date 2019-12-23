@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Making a binary from Node.js scripts</title>
+	<link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body class="article">
+	
+	<header>
+		<div class="breadcrumb"><a href="/">Home</a> &raquo; <a href="/blog">Blog</a> &raquo; Blog post</div>
+		<h1>Making a binary from Node.js scripts</h1>
+		<h4>By Peter West &bullet; 22nd December 2019 21:28</h4>
+	</header>
+
+	<img src="/media/node-exe.png">
+
+	<p>I often find myself needing to package a Node.js project as a single binary file, i.e. turn the source tree into a single self-executable file.</p>
+
+	<p>There are a few tools which can be used to do this, such as <a href="https://github.com/zeit/pkg"><code>pkg</code></a>. However, pkg does not work with binary modules, such as the <code>sharp</code> module for image manipulation.</p>
+
+	<p>In the end, I wrote my own script to generate a self-executing binary based on a <a href="https://www.linuxjournal.com/node/1005818">Linux Journal article on bash self-extracting scripts</a>. This works as follows:
+
+	<ol>
+		<li>Package the source tree, node binary, and node modules in a tar.gz (the payload).</li>
+		<li>Append the payload to the end of a shell script. When executed, the script extracts and runs the payload in a temporary location.</li>
+	</ol>
+
+	<p>Here is the code (only tested on linux):</p>
+
+	<script src="https://gist.github.com/FlamingTempura/0ddfd3f48576da23fa1226f6f6a76105.js"></script>
+
+
+</body></html>

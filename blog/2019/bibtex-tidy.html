@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Creating a BibTeX Parser and Tidy tool</title>
+	<link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body class="article">
+	
+	<header>
+		<div class="breadcrumb"><a href="/">Home</a> &raquo; <a href="/blog">Blog</a> &raquo; Blog post</div>
+		<h1>Creating a BibTeX Parser and Tidy tool</h1>
+		<h4>By Peter West &bullet; 12th March 2019 12:17</h4>
+	</header>
+
+	<img src="/media/bibtex-tidy.png">
+
+	<p>BibTeX bibliographies of hundreds of references are a nightmare to maintain. They end up messy, because there is no standard for BibTeX whitespace amongst publication citation exporters, and full of often unneeded metadata, such as ACM IDs or pubmed IDs.</p>
+
+	<p>I struggled to find a compelling way to clean up large BibTeX files. A StackExchange <a href="https://tex.stackexchange.com/questions/76420/cleaning-up-a-bib-file">question</a> revealed a few techniques, but these involved fairly complex workflows (like importing and exporting from JabRef). What I needed was an online tidier, similar to <a href="https://jsonformatter.org/">JSON Formatter</a> for tidying JSON.</p>
+
+	<p>Sadly, I could not find one, so I went about creating my own. This turned out to be more challenging than I thought... It turns out that BibTeX has a variety of conflicting documents on syntax, so the parser needed to be able to handle files of messy and incomplete syntax.</p>
+
+	<p>See the below valid but messy BibTeX file:</p>
+
+<pre><code>@String {maintainer = "The Boss"}
+
+@preamble { "Maintained by " # maintainer }
+@Comment{A comment}
+@Article{py03,
+     author = {Xavier D\'ecoret},
+     title  = "PyBiTex",
+     year   = 2003
+}
+
+@Comment{
+  @Book{steward03,
+    author =	 {Martha Steward},
+    title =	 {Cooking behind bars},
+    publisher =	 {Culinary Expert Series},
+    year =	 2003
+  }
+  @Article{py04,
+     author = {Xavier D\'ecoret},
+     title  = "PyBiTex",
+     year   = 2003
+	}}
+	@boo{fd,fds=foo
+}
+
+@String(mar = "march")
+      
+@Book{sweig42,
+   author = "Ulrich {\"{U}}nderwood and Ned {\~N}et and Paul {\={P}}ot",
+   title = "Fighting Fire with Fire: Festooning {F}rench Phrases",
+   school = "Fanstord University",
+   type = "{PhD} Dissertation",
+   address = "Department of French",
+   month = jun # "-" # aug,
+   year = 1988,
+   note = "This is a full PHDTHESIS entry",
+}
+</pre></code>
+
+	<p>How many references are in this file? There are three: py03, fd, and sweig42. The other two - steward03 and py04 - are within a comment entry and are therefore ignored.</p>
+
+	<p>Note also that double quotes or braces can be used to enclose values, and that values can be concatenated using the hash symbol.</p>
+
+	<p>Within values, accented characters can be formed using backslash prefixes and braces can be used to ensure text is presented verbatim in LaTeX documents (i.e., not capitalised).</p>
+
+	<p>There are variables too; @string is used to define them, and there are some built in, such as months (jan, feb, etc). And @preamble defines LaTeX code to run prior to generating the bibliography. Both @string and @preamble, as well as entries, can be enclosed in braces or parentheses.</p>
+
+	<p>BibTeX is far more advanced than I had first assumed, and the parser would need to handle these more complex features.</p>
+
+	<p>By scraping together a corpus of BibTeX references found 'in the wild' (i.e., exported from a variety of publications), I was able to put together a grammar which does a good job of parsing BibTeX files even with common syntax errors (see the PEG grammar <a href="https://github.com/FlamingTempura/bibtex-parse/blob/master/src/bibtex.pegjs">here</a>):</p>
+
+<pre><code>START    ::= ITEM*
+ITEM     ::= PREAMBLE
+           | STRING
+           | ENTRY
+           | COMMENT
+PREAMBLE ::= '@preamble' _ ( '(' ( _ EXPRESSION _ | BRACED ) ')'
+                           | '{' ( _ EXPRESSION _ | BRACED ) '}' )
+STRING   ::= '@string' _ ( '(' _ ASSIGNMENT _ ')'
+                         | '{' _ ASSIGNMENT _ '}' )
+ENTRY    ::= '@' IDENTIFIER _ ( '{' _ ENTRY_BODY _ '}'
+                              | '(' _ ENTRY_BODY _ ')' )
+ENTRY_BODY
+         ::= ( IDENTIFIER _ ',' )? _ ( ASSIGNMENT ( _ ',' _ ASSIGNMENT )* )? _ ','?
+ASSIGNMENT
+         ::= $ IDENTIFIER ( [# ]+ $ IDENTIFIER )* ( _ '=' _ EXPRESSION )?
+EXPRESSION
+         ::= LITERAL ( _ '#' _ LITERAL )*
+LITERAL  ::= '"' $ ( ESCAPED_CHAR | [^"{] )* ( '{' ( BRACED '}' )? $ ( ESCAPED_CHAR | [^"{] )* )* '"'
+           | '{' BRACED '}'
+           | NUMBER
+           | IDENTIFIER
+ESCAPED_CHAR
+         ::= '\\'
+           | '\{'
+           | '\}'
+           | '\"'
+COMMENT  ::= $ ( [^@]+ | '@' ( 'comment' ( _ '{' BRACED '}' | [^#xA#xD]* LINE_END ) | [^A-Za-z0-9]+ | IDENTIFIER _ [^{(] ) )
+IDENTIFIER
+         ::= $ [^=#,{}()[#x5D #x9#xA#xD]+
+NUMBER   ::= [0-9]+
+BRACED   ::= $ ( ESCAPED_CHAR | [^{}] )* ( '{' BRACED '}' BRACED )?
+_        ::= [ #x9#xA#xD]*
+LINE_END ::= #xD? #xA?
+           | [#x2028#x2029]
+</code></pre>
+
+	<p>Once the parser worked, I created a tool to identify duplicates amongst the entries and recompile the BibTeX file with consistent spacing and syntax. When the messy BibTeX file above is passed in, the following cleaner code is generated:</p>
+
+<pre><code>@string{maintainer = "The Boss"}
+@preamble{"Maintained by " # maintainer}
+@article{py03,
+	title        = {PyBiTex},
+	author       = {Xavier D\'ecoret},
+	year         = 2003
+}
+@boo{fd,
+	fds          = {foo}
+}
+@string{mar = "march"}
+@book{sweig42,
+	title        = {Fighting Fire with Fire: Festooning {F}rench Phrases},
+	author       = {Ulrich {\"{U}}nderwood and Ned {\~N}et and Paul {\={P}}ot},
+	year         = 1988,
+	month        = jun # "-" # aug,
+	address      = {Department of French},
+	note         = {This is a full PHDTHESIS entry},
+	school       = {Fanstord University},
+	type         = {{PhD} Dissertation}
+}
+</code></pre>
+
+	<p>Try out the BibTeX Tidy tool <a href="https://flamingtempura.github.io/bibtex-tidy/">here</a>.</p>
+
+	<p>Find the code <a href="https://github.com/FlamingTempura/bibtex-tidy">here</a>.</p>
+
+</body></html>
