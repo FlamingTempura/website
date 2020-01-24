@@ -99,7 +99,7 @@ fs.readdirSync(path.resolve(__dirname, '../blog')).map(year => {
 		let titlematch = post.match(/<h1>(.*)<\/h1>/),
 			publisherMatch = post.match(/<div class="publisher">(.*)<\/div>/),
 			picMatch = post.match(/<img [^>]*src="([^"]*)"/),
-			introMatch = post.match(/<p>(.*)<\/p>/);
+			introMatch = post.match(/<p>(.*?)<\/p>/s);
 
 		bibs.blog.push({
 			date,
